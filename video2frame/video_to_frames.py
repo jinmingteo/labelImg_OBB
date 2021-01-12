@@ -40,6 +40,7 @@ def get_frame_from_path(path, output_dir, images_per_sec=1, force_render=False):
         else:
             os.makedirs(subfolder, exist_ok=True)
             get_frame_from_video(os.path.join(path, video), output_dir, images_per_sec)
+    print ('Video2Frames Completed')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert Video to Frames')
