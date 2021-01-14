@@ -1,4 +1,4 @@
-LabelImg
+LabelImg_OBB
 ========
 
 .. image:: https://img.shields.io/pypi/v/labelimg.svg
@@ -12,16 +12,20 @@ LabelImg
     :align: center
 
 LabelImg is a graphical image annotation tool.
+LabelImg_OBB is a fork that adds the oriented bounding boxes (OBB) feature.
 
 It is written in Python and uses Qt for its graphical interface.
 
 Annotations are saved as XML files in PASCAL VOC format, the format used
-by `ImageNet <http://www.image-net.org/>`__.  Besides, it also supports YOLO format
+by `ImageNet <http://www.image-net.org/>`__.  Besides, it also supports YOLO and YOLO OBB format
 
-.. image:: https://raw.githubusercontent.com/tzutalin/labelImg/master/demo/demo3.jpg
+.. image:: https://raw.githubusercontent.com/heshameraqi/labelImg/master/demo/demo6.png
      :alt: Demo Image
 
-.. image:: https://raw.githubusercontent.com/tzutalin/labelImg/master/demo/demo.jpg
+.. image:: https://raw.githubusercontent.com/heshameraqi/labelImg/master/demo/demo3.jpg
+     :alt: Demo Image
+
+.. image:: https://raw.githubusercontent.com/heshameraqi/labelImg/master/demo/demo.jpg
      :alt: Demo Image
 
 `Watch a demo video <https://youtu.be/p0nR2YsCY_U>`__
@@ -47,6 +51,8 @@ Python 3 + Qt5
 .. code:: shell
 
     sudo apt-get install pyqt5-dev-tools
+    sudo apt-get install libxml2-dev libxslt1-dev
+    sudo apt-get install python3-tk
     sudo pip3 install -r requirements/requirements-linux-python3.txt
     make qt5py3
     python3 labelImg.py
@@ -161,16 +167,16 @@ Steps (PascalVOC)
 2. Click 'Change default saved annotation folder' in Menu/File
 3. Click 'Open Dir'
 4. Click 'Create RectBox'
-5. Click and release left mouse to select a region to annotate the rect
-   box
-6. You can use right mouse to drag the rect box to copy or move it
+5. Click and release left mouse button to select a region to annotate the rect
+   box and set its orientation
+6. You can use right mouse button to drag the rect box to copy or move it. To rotate drag using right mouse button from box vertices (red dots).
 
 The annotation will be saved to the folder you specify.
 
 You can refer to the below hotkeys to speed up your workflow.
 
-Steps (YOLO)
-~~~~~~~~~~~~
+Steps (YOLO or YOLO_OBB)
+~~~~~
 
 1. In ``data/predefined_classes.txt`` define the list of classes that will be used for your training.
 
@@ -200,53 +206,31 @@ to load pre-defined classes
 Hotkeys
 ~~~~~~~
 
-+--------------------+--------------------------------------------+
-| Ctrl + u           | Load all of the images from a directory    |
-+--------------------+--------------------------------------------+
-| Ctrl + r           | Change the default annotation target dir   |
-+--------------------+--------------------------------------------+
-| Ctrl + s           | Save                                       |
-+--------------------+--------------------------------------------+
-| Ctrl + d           | Copy the current label and rect box        |
-+--------------------+--------------------------------------------+
-| Ctrl + Shift + d   | Delete the current image                   |
-+--------------------+--------------------------------------------+
-| Space              | Flag the current image as verified         |
-+--------------------+--------------------------------------------+
-| w                  | Create a rect box                          |
-+--------------------+--------------------------------------------+
-| d                  | Next image                                 |
-+--------------------+--------------------------------------------+
-| a                  | Previous image                             |
-+--------------------+--------------------------------------------+
-| del                | Delete the selected rect box               |
-+--------------------+--------------------------------------------+
-| Ctrl++             | Zoom in                                    |
-+--------------------+--------------------------------------------+
-| Ctrl--             | Zoom out                                   |
-+--------------------+--------------------------------------------+
-| ↑→↓←             |  Keyboard arrows to move selected rect box   |
-+--------------------+--------------------------------------------+
-
-**Verify Image:**
-
-When pressing space, the user can flag the image as verified, a green background will appear.
-This is used when creating a dataset automatically, the user can then through all the pictures and flag them instead of annotate them.
-
-**Difficult:**
-
-The difficult field is set to 1 indicates that the object has been annotated as "difficult", for example, an object which is clearly visible but difficult to recognize without substantial use of context.
-According to your deep neural network implementation, you can include or exclude difficult objects during training.
-
-How to reset the settings
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In case there are issues with loading the classes, you can either:
-
-1. From the top menu of the labelimg click on Menu/File/Reset All
-2. Remove the `.labelImgSettings.pkl` from your home directory. In Linux and Mac you can do:
-    `rm ~/.labelImgSettings.pkl`
-
++------------+--------------------------------------------+
+| Ctrl + u   | Load all of the images from a directory    |
++------------+--------------------------------------------+
+| Ctrl + r   | Change the default annotation target dir   |
++------------+--------------------------------------------+
+| Ctrl + s   | Save                                       |
++------------+--------------------------------------------+
+| Ctrl + d   | Copy the current label and rect box        |
++------------+--------------------------------------------+
+| Space      | Flag the current image as verified         |
++------------+--------------------------------------------+
+| w          | Create a rect box                          |
++------------+--------------------------------------------+
+| d          | Next image                                 |
++------------+--------------------------------------------+
+| a          | Previous image                             |
++------------+--------------------------------------------+
+| del        | Delete the selected rect box               |
++------------+--------------------------------------------+
+| Ctrl++     | Zoom in                                    |
++------------+--------------------------------------------+
+| Ctrl--     | Zoom out                                   |
++------------+--------------------------------------------+
+|            | Keyboard arrows to move selected rect box  |
++------------+--------------------------------------------+
 
 How to contribute
 ~~~~~~~~~~~~~~~~~

@@ -13,6 +13,7 @@ from libs.pascal_voc_io import XML_EXT
 from libs.create_ml_io import CreateMLWriter
 from libs.create_ml_io import JSON_EXT
 from enum import Enum
+from libs.yolo_obb_io import YOLOOBBWriter, TXT_EXT
 import os.path
 import sys
 
@@ -28,9 +29,9 @@ class LabelFileError(Exception):
 
 
 class LabelFile(object):
-    # It might be changed as window creates. By default, using XML ext
+    # It might be changed as window creates. By default, using TXT ext
     # suffix = '.lif'
-    suffix = XML_EXT
+    suffix = TXT_EXT
 
     def __init__(self, filename=None):
         self.shapes = ()
@@ -111,6 +112,36 @@ class LabelFile(object):
             difficult = int(shape['difficult'])
             bndbox = LabelFile.convertPoints2BndBox(points)
             writer.addBndBox(bndbox[0], bndbox[1], bndbox[2], bndbox[3], label, difficult)
+
+        writer.save(targetFile=filename, classList=classList)
+        return
+    
+    def saveYoloOBBFormat(self, filename, shapes, imagePath, imageData, classList,
+                            lineColor=None, fillColor=None, databaseSrc=None):
+        imgFolderPath = os.path.dirname(imagePath)
+        imgFolderName = os.path.split(imgFolderPath)[-1]
+        imgFileName = os.path.basename(imagePath)
+        #imgFileNameWithoutExt = os.path.splitext(imgFileName)[0]
+        # Read from file path because self.imageData might be empty if saving to
+        # Pascal format
+        image = QImage()
+        image.load(imagePath)
+        imageShape = [image.height(), image.width(),
+                      1 if image.isGrayscale() else 3]
+        writer = YOLOOBBWriter(imgFolderName, imgFileName,
+                                 imageShape, localImgPath=imagePath)
+        writer.verified = self.verified
+
+        for shape in shapes:
+            centre_x_y = shape['centre_x_y']
+            height = shape['height']
+            width = shape['width']
+            angle = shape['angle']
+            label = shape['label']
+            # Add Chris
+            difficult = int(shape['difficult'])
+            
+            writer.addBndBox(centre_x_y[0], centre_x_y[1], height, width, angle, label, difficult)
 
         writer.save(targetFile=filename, classList=classList)
         return

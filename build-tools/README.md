@@ -14,6 +14,14 @@ sh envsetup.sh
 sh build-ubuntu-binary.sh
 ```
 
+### Build for Windows with PyInstaller
+
+```
+pip install pyinstaller
+pyinstaller labelImg.py
+This will generate the bundle in a subdirectory called dist.
+```
+
 ### Build for Windows
 
 ```

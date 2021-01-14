@@ -1,3 +1,4 @@
+import math
 
 try:
     from PyQt5.QtGui import *
@@ -17,6 +18,7 @@ CURSOR_POINT = Qt.PointingHandCursor
 CURSOR_DRAW = Qt.CrossCursor
 CURSOR_MOVE = Qt.ClosedHandCursor
 CURSOR_GRAB = Qt.OpenHandCursor
+CURSOR_CROSS = Qt.CrossCursor
 
 # class Canvas(QGLWidget):
 
@@ -161,19 +163,8 @@ class Canvas(QWidget):
             self.repaint()
             return
 
-        # Polygon copy moving.
-        if Qt.RightButton & ev.buttons():
-            if self.selectedShapeCopy and self.prevPoint:
-                self.overrideCursor(CURSOR_MOVE)
-                self.boundedMoveShape(self.selectedShapeCopy, pos)
-                self.repaint()
-            elif self.selectedShape:
-                self.selectedShapeCopy = self.selectedShape.copy()
-                self.repaint()
-            return
-
-        # Polygon/Vertex moving.
-        if Qt.LeftButton & ev.buttons():
+        # Polygon/Vertex moving or rotation.
+        if Qt.LeftButton & ev.buttons(): # ev.buttons is mouse buttons mask (https://doc.qt.io/qt-5/qt.html#MouseButton-enum)
             if self.selectedVertex():
                 self.boundedMoveVertex(pos)
                 self.shapeMoved.emit()
@@ -191,6 +182,24 @@ class Canvas(QWidget):
                 self.scrollRequest.emit(delta_y, Qt.Vertical)
                 self.update()
             return
+        elif Qt.RightButton & ev.buttons(): # ev.buttons is mouse buttons mask (https://doc.qt.io/qt-5/qt.html#MouseButton-enum)
+            if self.selectedVertex():
+                self.overrideCursor(CURSOR_CROSS)
+                self.rotateVertex(pos)
+                self.shapeMoved.emit()
+                self.repaint()
+            return
+        
+        # Polygon copy moving.
+        if Qt.RightButton & ev.buttons():
+            if self.selectedShapeCopy and self.prevPoint:
+                self.overrideCursor(CURSOR_MOVE)
+                self.boundedMoveShape(self.selectedShapeCopy, pos)
+                self.repaint()
+            elif self.selectedShape:
+                self.selectedShapeCopy = self.selectedShape.copy()
+                self.repaint()
+            return
 
         # Just hovering over the canvas, 2 posibilities:
         # - Highlight shapes
@@ -207,7 +216,7 @@ class Canvas(QWidget):
                 self.hVertex, self.hShape = index, shape
                 shape.highlightVertex(index, shape.MOVE_VERTEX)
                 self.overrideCursor(CURSOR_POINT)
-                self.setToolTip("Click & drag to move point")
+                self.setToolTip("Left Click & Drag point to move. Right Click & Drag points to rotate.")
                 self.setStatusTip(self.toolTip())
                 self.update()
                 break
@@ -216,7 +225,7 @@ class Canvas(QWidget):
                     self.hShape.highlightClear()
                 self.hVertex, self.hShape = None, shape
                 self.setToolTip(
-                    "Click & drag to move shape '%s'" % shape.label)
+                    "Click & Drag to move shape '%s'. Right Click points to rotate." % shape.label)
                 self.setStatusTip(self.toolTip())
                 self.overrideCursor(CURSOR_GRAB)
                 self.update()
@@ -238,18 +247,20 @@ class Canvas(QWidget):
                 selection = self.selectShapePoint(pos)
                 self.prevPoint = pos
 
-                if selection is None:
-                    #pan
-                    QApplication.setOverrideCursor(QCursor(Qt.OpenHandCursor))
-                    self.pan_initial_pos = pos
+        #         if selection is None:
+        #             #pan
+        #             QApplication.setOverrideCursor(QCursor(Qt.OpenHandCursor))
+        #             self.pan_initial_pos = pos
 
-        elif ev.button() == Qt.RightButton and self.editing():
+        # elif ev.button() == Qt.RightButton and self.editing():
+                self.repaint()
+        elif ev.button() == Qt.RightButton and self.editing() and (not self.selectedVertex()):
             self.selectShapePoint(pos)
             self.prevPoint = pos
         self.update()
 
     def mouseReleaseEvent(self, ev):
-        if ev.button() == Qt.RightButton:
+        if ev.button() == Qt.RightButton and (not self.selectedVertex()):
             menu = self.menus[bool(self.selectedShapeCopy)]
             self.restoreCursor()
             if not menu.exec_(self.mapToGlobal(ev.pos()))\
@@ -262,6 +273,7 @@ class Canvas(QWidget):
                 self.overrideCursor(CURSOR_POINT)
             else:
                 self.overrideCursor(CURSOR_GRAB)
+            
         elif ev.button() == Qt.LeftButton:
             pos = self.transformPos(ev.pos())
             if self.drawing():
@@ -300,7 +312,7 @@ class Canvas(QWidget):
             targetPos = self.line[1]
             maxX = targetPos.x()
             maxY = targetPos.y()
-            self.current.addPoint(QPointF(maxX, minY))
+            self.current.addPoint(QPointF(maxX, minY)) # Adding canvas points is done here
             self.current.addPoint(targetPos)
             self.current.addPoint(QPointF(minX, maxY))
             self.finalise()
@@ -390,21 +402,46 @@ class Canvas(QWidget):
                                opposite_point.y() + directionY * min_size - point.y())
         else:
             shiftPos = pos - point
-
         shape.moveVertexBy(index, shiftPos)
+        
+        # calculate the remaining first vertices
+        dist_moved = math.sqrt( ((pos.x()-point.x())**2) + ((pos.y()-point.y())**2) )
+        third_point_index = (index + 2) % 4
+        
+        pointToMove_index = (index + 1) % 4
+        base = math.sqrt( ((shape.points[pointToMove_index].x()-shape.points[third_point_index].x())**2) +
+                          ((shape.points[pointToMove_index].y()-shape.points[third_point_index].y())**2) )
+        near_side_sqrd = ((shape.points[pointToMove_index].x()-pos.x())**2) + ((shape.points[pointToMove_index].y()-pos.y())**2)
+        far_side_sqrd = ((shape.points[third_point_index].x()-pos.x())**2) + ((shape.points[third_point_index].y()-pos.y())**2)
+        dist_to_moved = ((near_side_sqrd-far_side_sqrd)/base+base)/2
+        shape.points[pointToMove_index].setX(shape.points[pointToMove_index].x() +
+                          dist_to_moved * (shape.points[third_point_index].x() - shape.points[pointToMove_index].x() ) / base)
+        shape.points[pointToMove_index].setY(shape.points[pointToMove_index].y() +
+                          dist_to_moved * (shape.points[third_point_index].y() - shape.points[pointToMove_index].y() ) / base)       
 
-        lindex = (index + 1) % 4
-        rindex = (index + 3) % 4
-        lshift = None
-        rshift = None
-        if index % 2 == 0:
-            rshift = QPointF(shiftPos.x(), 0)
-            lshift = QPointF(0, shiftPos.y())
-        else:
-            lshift = QPointF(shiftPos.x(), 0)
-            rshift = QPointF(0, shiftPos.y())
-        shape.moveVertexBy(rindex, rshift)
-        shape.moveVertexBy(lindex, lshift)
+        # calculate the remaining second vertices
+        pointToMove_index = (index + 3) % 4
+        base = math.sqrt( ((shape.points[pointToMove_index].x()-shape.points[third_point_index].x())**2) +
+                          ((shape.points[pointToMove_index].y()-shape.points[third_point_index].y())**2) )
+        near_side_sqrd = ((shape.points[pointToMove_index].x()-pos.x())**2) + ((shape.points[pointToMove_index].y()-pos.y())**2)
+        far_side_sqrd = ((shape.points[third_point_index].x()-pos.x())**2) + ((shape.points[third_point_index].y()-pos.y())**2)
+        dist_to_moved = ((near_side_sqrd-far_side_sqrd)/base+base)/2
+        shape.points[pointToMove_index].setX(shape.points[pointToMove_index].x() +
+                          dist_to_moved * (shape.points[third_point_index].x() - shape.points[pointToMove_index].x() ) / base)
+        shape.points[pointToMove_index].setY(shape.points[pointToMove_index].y() +
+                          dist_to_moved * (shape.points[third_point_index].y() - shape.points[pointToMove_index].y() ) / base)  
+
+        
+    def rotateVertex(self, pos):
+        index, shape = self.hVertex, self.hShape
+        point = shape[index]
+        if self.outOfPixmap(pos):
+            pos = self.intersectionPoint(point, pos)
+
+        if not self.drawSquare:
+            angle_target =   math.atan2(pos.y()  -shape.origin[1], pos.x()  -shape.origin[0])
+            angle_original = math.atan2(point.y()-shape.origin[1], point.x()-shape.origin[0])
+            shape.rotateBy(angle_target-angle_original, self.pixmap.width(), self.pixmap.height()) # Clock-wise
 
     def boundedMoveShape(self, shape, pos):
         if self.outOfPixmap(pos):
@@ -542,7 +579,8 @@ class Canvas(QWidget):
             self.drawingPolygon.emit(False)
             self.update()
             return
-
+        
+        self.current.updateOBBInfo()
         self.current.close()
         self.shapes.append(self.current)
         self.current = None
@@ -675,6 +713,8 @@ class Canvas(QWidget):
     def loadShapes(self, shapes):
         self.shapes = list(shapes)
         self.current = None
+        for s in shapes:
+            s.updateOBBInfo()
         self.repaint()
 
     def setShapeVisible(self, shape, value):

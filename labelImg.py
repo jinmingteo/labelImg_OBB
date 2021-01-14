@@ -43,6 +43,7 @@ from libs.toolBar import ToolBar
 from libs.pascal_voc_io import PascalVocReader
 from libs.pascal_voc_io import XML_EXT
 from libs.yolo_io import YoloReader
+from libs.yolo_obb_io import YoloOBBReader
 from libs.yolo_io import TXT_EXT
 from libs.create_ml_io import CreateMLReader
 from libs.create_ml_io import JSON_EXT
@@ -89,7 +90,10 @@ class MainWindow(QMainWindow, WindowMixin):
 
         # Save as Pascal voc xml
         self.defaultSaveDir = defaultSaveDir
-        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.PASCAL_VOC)
+        self.labelFileFormat = settings.get(SETTING_LABEL_FILE_FORMAT, LabelFileFormat.YOLO)
+        self.usingPascalVocFormat = False
+        self.usingYoloFormat = False
+        self.usingYoloOBBFormat = True # Default Format
 
         # For loading all image under a directory
         self.mImgList = []
@@ -201,7 +205,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         self.dockFeatures = QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetFloatable
         self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
-
+        
         # Actions
         action = partial(newAction, self)
         quit = action(getStr('quit'), self.close,
@@ -234,21 +238,8 @@ class MainWindow(QMainWindow, WindowMixin):
         save = action(getStr('save'), self.saveFile,
                       'Ctrl+S', 'save', getStr('saveDetail'), enabled=False)
 
-        def getFormatMeta(format):
-            """
-            returns a tuple containing (title, icon_name) of the selected format
-            """
-            if format == LabelFileFormat.PASCAL_VOC:
-                return ('&PascalVOC', 'format_voc')
-            elif format == LabelFileFormat.YOLO:
-                return ('&YOLO', 'format_yolo')
-            elif format == LabelFileFormat.CREATE_ML:
-                return ('&CreateML', 'format_createml')
-
-        save_format = action(getFormatMeta(self.labelFileFormat)[0],
-                             self.change_format, 'Ctrl+',
-                             getFormatMeta(self.labelFileFormat)[1],
-                             getStr('changeSaveFormat'), enabled=True)
+        save_format = action('&YOLO_OBB', self.change_format,
+                      'Ctrl+', 'format_yolo_obb', getStr('changeSaveFormat'), enabled=True)
 
         saveAs = action(getStr('saveAs'), self.saveFileAs,
                         'Ctrl+Shift+S', 'save-as', getStr('saveAsDetail'), enabled=False)
@@ -286,6 +277,7 @@ class MainWindow(QMainWindow, WindowMixin):
                          'Ctrl+A', 'hide', getStr('showAllBoxDetail'),
                          enabled=False)
 
+        showQuickInstr = action(getStr('quickinstr'), self.showQuickInstrDialog, None, 'help', getStr('quickinstr'))
         help = action(getStr('tutorial'), self.showTutorialDialog, None, 'help', getStr('tutorialDetail'))
         showInfo = action(getStr('info'), self.showInfoDialog, None, 'help', getStr('info'))
 
@@ -381,7 +373,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # Auto saving : Enable auto saving if pressing next
         self.autoSaving = QAction(getStr('autoSaveMode'), self)
         self.autoSaving.setCheckable(True)
-        self.autoSaving.setChecked(settings.get(SETTING_AUTO_SAVE, False))
+        self.autoSaving.setChecked(settings.get(SETTING_AUTO_SAVE, True))
         # Sync single class mode from PR#106
         self.singleClassMode = QAction(getStr('singleClsMode'), self)
         self.singleClassMode.setShortcut("Ctrl+Shift+S")
@@ -396,8 +388,10 @@ class MainWindow(QMainWindow, WindowMixin):
         self.displayLabelOption.triggered.connect(self.togglePaintLabelsOption)
 
         addActions(self.menus.file,
-                   (open, opendir, copyPrevBounding, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, deleteImg, quit))
-        addActions(self.menus.help, (help, showInfo))
+        #            (open, opendir, copyPrevBounding, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, deleteImg, quit))
+        # addActions(self.menus.help, (help, showInfo))
+                   (open, opendir, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, quit))
+        addActions(self.menus.help, (showQuickInstr, help, showInfo))
         addActions(self.menus.view, (
             self.autoSaving,
             self.singleClassMode,
@@ -440,7 +434,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.fit_window = False
         # Add Chris
         self.difficult = False
-
+        
         ## Fix the compatible issue for qt4 and qt5. Convert the QStringList to python list
         if settings.get(SETTING_RECENT_FILES):
             if have_qstring():
@@ -516,34 +510,42 @@ class MainWindow(QMainWindow, WindowMixin):
 
     ## Support Functions ##
     def set_format(self, save_format):
+        '''
         if save_format == FORMAT_PASCALVOC:
             self.actions.save_format.setText(FORMAT_PASCALVOC)
             self.actions.save_format.setIcon(newIcon("format_voc"))
-            self.labelFileFormat = LabelFileFormat.PASCAL_VOC
+            self.usingPascalVocFormat = False
+            self.usingYoloFormat = False
+            self.usingYoloOBBFormat = True
             LabelFile.suffix = XML_EXT
 
         elif save_format == FORMAT_YOLO:
             self.actions.save_format.setText(FORMAT_YOLO)
             self.actions.save_format.setIcon(newIcon("format_yolo"))
-            self.labelFileFormat = LabelFileFormat.YOLO
+            self.usingPascalVocFormat = False
+            self.usingYoloFormat = False
+            self.usingYoloOBBFormat = True
             LabelFile.suffix = TXT_EXT
+            
+        elif save_format == FORMAT_YOLO_OBB:'''
+        
+        self.actions.save_format.setText(FORMAT_YOLO_OBB)
+        self.actions.save_format.setIcon(newIcon("format_yolo_obb"))
+        self.usingPascalVocFormat = False
+        self.usingYoloFormat = False
+        self.usingYoloOBBFormat = True
+        LabelFile.suffix = TXT_EXT
 
-        elif save_format == FORMAT_CREATEML:
-            self.actions.save_format.setText(FORMAT_CREATEML)
-            self.actions.save_format.setIcon(newIcon("format_createml"))
-            self.labelFileFormat = LabelFileFormat.CREATE_ML
-            LabelFile.suffix = JSON_EXT
+        # elif save_format == FORMAT_CREATEML:
+        #     self.actions.save_format.setText(FORMAT_CREATEML)
+        #     self.actions.save_format.setIcon(newIcon("format_createml"))
+        #     self.labelFileFormat = LabelFileFormat.CREATE_ML
+        #     LabelFile.suffix = JSON_EXT
 
     def change_format(self):
-        if self.labelFileFormat == LabelFileFormat.PASCAL_VOC:
-            self.set_format(FORMAT_YOLO)
-        elif self.labelFileFormat == LabelFileFormat.YOLO:
-            self.set_format(FORMAT_CREATEML)
-        elif self.labelFileFormat == LabelFileFormat.CREATE_ML:
-            self.set_format(FORMAT_PASCALVOC)
-        else:
-            raise ValueError('Unknown label file format.')
-        self.setDirty()
+        if self.usingPascalVocFormat: self.set_format(FORMAT_YOLO)
+        elif self.usingYoloFormat: self.set_format(FORMAT_YOLO_OBB)
+        elif self.usingYoloOBBFormat: self.set_format(FORMAT_PASCALVOC)
 
     def noShapes(self):
         return not self.itemsToShapes
@@ -645,6 +647,10 @@ class MainWindow(QMainWindow, WindowMixin):
             return ['open']
 
     ## Callbacks ##
+    def showQuickInstrDialog(self):
+        msg = "Left Click & Drag to create object. Left Click to move it. Left Click points to resize it. Right Click points to rotate it."
+        QMessageBox.information(self, u'Quick Instructions', msg)
+        
     def showTutorialDialog(self):
         subprocess.Popen(self.screencastViewer + [self.screencast])
 
@@ -817,6 +823,37 @@ class MainWindow(QMainWindow, WindowMixin):
             self.addLabel(shape)
         self.updateComboBox()
         self.canvas.loadShapes(s)
+        
+    def loadOBBLabels(self, shapes):
+        s = []
+        for label, centre_x, centre_y, height, width, angle, line_color, fill_color, difficult in shapes:
+            shape = Shape(label=label)
+
+            # If shape origin is within boundaries
+            if centre_x > 0 and centre_x < self.canvas.pixmap.width() and centre_y > 0 and centre_y < self.canvas.pixmap.height():
+                shape.origin = [centre_x, centre_y]
+                shape.height = height
+                shape.width = width
+                shape.angle = angle
+                shape.difficult = difficult
+                shape.close()
+                if (shape.updatePointsFromOBBInfo(self.canvas.pixmap.width(), self.canvas.pixmap.height())):
+                    self.setDirty()
+                    s.append(shape)
+
+            if line_color:
+                shape.line_color = QColor(*line_color)
+            else:
+                shape.line_color = generateColorByText(label)
+
+            if fill_color:
+                shape.fill_color = QColor(*fill_color)
+            else:
+                shape.fill_color = generateColorByText(label)
+
+            self.addLabel(shape)
+
+        self.canvas.loadShapes(s)
 
     def updateComboBox(self):
         # Get the unique labels and add them to the Combobox.
@@ -843,24 +880,42 @@ class MainWindow(QMainWindow, WindowMixin):
                        # add chris
                         difficult = s.difficult)
 
+        def format_obb_shape(s):
+            return dict(label=s.label,
+                        line_color=s.line_color.getRgb(),
+                        fill_color=s.fill_color.getRgb(),
+                        centre_x_y=s.origin,
+                        height=s.height,
+                        width=s.width,
+                        angle=s.angle,
+                       # add chris
+                        difficult = s.difficult)
+
         shapes = [format_shape(shape) for shape in self.canvas.shapes]
         # Can add differrent annotation formats here
         try:
-            if self.labelFileFormat == LabelFileFormat.PASCAL_VOC:
-                if annotationFilePath[-4:].lower() != ".xml":
-                    annotationFilePath += XML_EXT
-                self.labelFile.savePascalVocFormat(annotationFilePath, shapes, self.filePath, self.imageData,
-                                                   self.lineColor.getRgb(), self.fillColor.getRgb())
-            elif self.labelFileFormat == LabelFileFormat.YOLO:
+            # if self.labelFileFormat == LabelFileFormat.PASCAL_VOC:
+            #     if annotationFilePath[-4:].lower() != ".xml":
+            #         annotationFilePath += XML_EXT
+            #     self.labelFile.savePascalVocFormat(annotationFilePath, shapes, self.filePath, self.imageData,
+            #                                        self.lineColor.getRgb(), self.fillColor.getRgb())
+            # elif self.labelFileFormat == LabelFileFormat.YOLO:
+            #     if annotationFilePath[-4:].lower() != ".txt":
+            #         annotationFilePath += TXT_EXT
+            #     self.labelFile.saveYoloFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
+            #                                   self.lineColor.getRgb(), self.fillColor.getRgb())
+            # elif self.labelFileFormat == LabelFileFormat.CREATE_ML:
+            #     if annotationFilePath[-5:].lower() != ".json":
+            #         annotationFilePath += JSON_EXT
+            #     self.labelFile.saveCreateMLFormat(annotationFilePath, shapes, self.filePath, self.imageData,
+            #                                       self.labelHist, self.lineColor.getRgb(), self.fillColor.getRgb())
+            #                                        self.lineColor.getRgb(), self.fillColor.getRgb())
+            if self.usingYoloOBBFormat is True:
+                shapes = [format_obb_shape(shape) for shape in self.canvas.shapes]
                 if annotationFilePath[-4:].lower() != ".txt":
                     annotationFilePath += TXT_EXT
-                self.labelFile.saveYoloFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
-                                              self.lineColor.getRgb(), self.fillColor.getRgb())
-            elif self.labelFileFormat == LabelFileFormat.CREATE_ML:
-                if annotationFilePath[-5:].lower() != ".json":
-                    annotationFilePath += JSON_EXT
-                self.labelFile.saveCreateMLFormat(annotationFilePath, shapes, self.filePath, self.imageData,
-                                                  self.labelHist, self.lineColor.getRgb(), self.fillColor.getRgb())
+                self.labelFile.saveYoloOBBFormat(annotationFilePath, shapes, self.filePath, self.imageData, self.labelHist,
+                                                   self.lineColor.getRgb(), self.fillColor.getRgb())
             else:
                 self.labelFile.save(annotationFilePath, shapes, self.filePath, self.imageData,
                                     self.lineColor.getRgb(), self.fillColor.getRgb())
@@ -1093,7 +1148,40 @@ class MainWindow(QMainWindow, WindowMixin):
             self.paintCanvas()
             self.addRecentFile(self.filePath)
             self.toggleActions(True)
-            self.showBoundingBoxFromAnnotationFile(filePath)
+            #self.showBoundingBoxFromAnnotationFile(filePath)
+
+            # Label xml file and show bound box according to its filename
+            # if self.usingPascalVocFormat is True:
+            if self.defaultSaveDir is not None:
+                basename = os.path.basename(
+                    os.path.splitext(self.filePath)[0])
+                xmlPath = os.path.join(self.defaultSaveDir, basename + XML_EXT)
+                txtPath = os.path.join(self.defaultSaveDir, basename + TXT_EXT)
+
+                """Annotation file priority:
+                PascalXML > YOLO_OBB > YOLO
+                """
+                if os.path.isfile(xmlPath):
+                    self.loadPascalXMLByFilename(xmlPath)
+                elif os.path.isfile(txtPath):
+                    with open(txtPath) as f:
+                        first_line = f.readline()
+                        if (first_line == "YOLO_OBB\n"):
+                            self.loadYOLOTOBBXTByFilename(txtPath)
+                        else:
+                            self.loadYOLOTXTByFilename(txtPath)
+            else:
+                xmlPath = os.path.splitext(filePath)[0] + XML_EXT
+                txtPath = os.path.splitext(filePath)[0] + TXT_EXT
+                if os.path.isfile(xmlPath):
+                    self.loadPascalXMLByFilename(xmlPath)
+                elif os.path.isfile(txtPath):
+                    with open(txtPath) as f:
+                        first_line = f.readline()
+                        if (first_line == "YOLO_OBB\n"):
+                            self.loadYOLOTOBBXTByFilename(txtPath)
+                        else:
+                            self.loadYOLOTXTByFilename(txtPath)
 
             self.setWindowTitle(__appname__ + ' ' + filePath)
 
@@ -1531,7 +1619,19 @@ class MainWindow(QMainWindow, WindowMixin):
         shapes = tYoloParseReader.getShapes()
         print (shapes)
         self.loadLabels(shapes)
-        self.canvas.verified = tYoloParseReader.verified
+        
+    def loadYOLOTOBBXTByFilename(self, txtPath):
+        if self.filePath is None:
+            return
+        if os.path.isfile(txtPath) is False:
+            return
+
+        self.set_format(FORMAT_YOLO_OBB)
+        tYoloOBBParseReader = YoloOBBReader(txtPath, self.image)
+        shapes = tYoloOBBParseReader.getShapes()
+        print (shapes)
+        self.loadOBBLabels(shapes)
+        self.canvas.verified = tYoloOBBParseReader.verified
 
     def loadCreateMLJSONByFilename(self, jsonPath, filePath):
         if self.filePath is None:
@@ -1596,6 +1696,9 @@ def get_main_app(argv=[]):
     win.show()
     return app, win
 
+# To restore PyQt4 behaviour of printing the traceback to stdout/stderr
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 
 def main():
     '''construct main app and run it'''
@@ -1603,4 +1706,6 @@ def main():
     return app.exec_()
 
 if __name__ == '__main__':
+    import sys
+    sys.excepthook = except_hook
     sys.exit(main())
