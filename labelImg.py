@@ -1617,7 +1617,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.set_format(FORMAT_YOLO)
         tYoloParseReader = YoloReader(txtPath, self.image)
         shapes = tYoloParseReader.getShapes()
-        print (shapes)
+
         self.loadLabels(shapes)
         
     def loadYOLOTOBBXTByFilename(self, txtPath):
@@ -1629,7 +1629,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.set_format(FORMAT_YOLO_OBB)
         tYoloOBBParseReader = YoloOBBReader(txtPath, self.image)
         shapes = tYoloOBBParseReader.getShapes()
-        print (shapes)
+
         self.loadOBBLabels(shapes)
         self.canvas.verified = tYoloOBBParseReader.verified
 

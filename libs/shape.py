@@ -129,41 +129,23 @@ class Shape(object):
             painter.fillPath(vrtx_path, self.vertex_fill_color)
             painter.fillPath(originPoint_path, self.origin_fill_color)
 
-            # Print debug info
-            min_x = sys.maxsize
-            min_y = sys.maxsize
-            for point in self.points:
-                min_x = min(min_x, point.x())
-                min_y = min(min_y, point.y())
-            if min_x != sys.maxsize and min_y != sys.maxsize:
-                font = QFont()
-                font.setPointSize(10)
-                font.setBold(True)
-                painter.setFont(font)
-                if(self.label == None):
-                    self.label = ""
-                if(min_y < MIN_Y_LABEL):
-                    min_y += MIN_Y_LABEL
-                painter.drawText(min_x, min_y, "h={0:.1f}, w={1:.1f} , \u03F4={2:.1f}".format(self.height, self.width, self.angle))
-
-            # Draw text at the top-left
             if self.paintLabel:
+                # Print debug info
                 min_x = sys.maxsize
                 min_y = sys.maxsize
-                min_y_label = int(1.25 * self.labelFontSize)
                 for point in self.points:
                     min_x = min(min_x, point.x())
                     min_y = min(min_y, point.y())
                 if min_x != sys.maxsize and min_y != sys.maxsize:
                     font = QFont()
-                    font.setPointSize(self.labelFontSize)
+                    font.setPointSize(10)
                     font.setBold(True)
                     painter.setFont(font)
                     if(self.label == None):
                         self.label = ""
-                    if(min_y < min_y_label):
-                        min_y += min_y_label
-                    painter.drawText(min_x, min_y, self.label)
+                    if(min_y < MIN_Y_LABEL):
+                        min_y += MIN_Y_LABEL
+                    painter.drawText(min_x, min_y, "h={0:.1f}, w={1:.1f} , \u03F4={2:.1f}".format(self.height, self.width, self.angle))
 
             if self.fill:
                 color = self.select_fill_color if self.selected else self.fill_color
