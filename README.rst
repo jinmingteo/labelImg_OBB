@@ -1,4 +1,7 @@
 LabelImg_OBB
+
+This is align with the old branch
+
 ========
 
 .. image:: https://img.shields.io/pypi/v/labelimg.svg
