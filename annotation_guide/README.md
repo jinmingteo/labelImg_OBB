@@ -17,7 +17,7 @@ Type command in terminal:
 
 Store the respective videos into the opened folder
 
-Open new Terminal **(Ctrl + Alt + T)**
+Open Terminal **(Ctrl + Alt + T)**
 
 Type command in terminal: 
 
@@ -27,7 +27,7 @@ You should see a "Video2Frames Completed" message from the terminal
 
 ## Step 2: Annotate Frames
 
-Open new Terminal **(Ctrl + Alt + T)**
+Open Terminal **(Ctrl + Alt + T)**
 
 Type command in terminal: 
 
@@ -41,7 +41,7 @@ Type command in terminal:
 
 2. Annotate
   - **Be sure to checkout this [annotation guide first](./Object%20Detection%20Annotation%20Guide.html).**
-
+  - You can refer to the video too.
 ~~~~~~~
 +------------+--------------------------------------------+
 | Create Box | Click 'Create OrientatedRectBox' or 'w'    |
@@ -72,6 +72,11 @@ Type command in terminal:
 #### Saving Issue
 - Under 'View' tab, check that "Auto-Save" mode is on
   - By auto-saving, you will not have to constantly choose the directory to save.
+
+#### Black / Pixelated Pop-ups
+- This is a known bug that we are looking into.
+  - If you encounter this, please perform the same action 
+    again, and it will work.
 
 #### Hotkeys
 ~~~~~~~
