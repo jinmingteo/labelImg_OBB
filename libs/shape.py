@@ -14,7 +14,7 @@ except ImportError:
     from PyQt4.QtGui import *
     from PyQt4.QtCore import *
 
-from libs.lib import distance
+from libs.utils import distance
 import sys
 
 DEFAULT_LINE_COLOR = QColor(0, 255, 0, 128)
@@ -45,6 +45,7 @@ class Shape(object):
     point_type = P_ROUND
     point_size = 8
     scale = 1.0
+    labelFontSize = 8
 
     def __init__(self, label=None, line_color=None, difficult=False, paintLabel=False):
         self.label = label
@@ -149,18 +150,19 @@ class Shape(object):
             if self.paintLabel:
                 min_x = sys.maxsize
                 min_y = sys.maxsize
+                min_y_label = int(1.25 * self.labelFontSize)
                 for point in self.points:
                     min_x = min(min_x, point.x())
                     min_y = min(min_y, point.y())
                 if min_x != sys.maxsize and min_y != sys.maxsize:
                     font = QFont()
-                    font.setPointSize(8)
+                    font.setPointSize(self.labelFontSize)
                     font.setBold(True)
                     painter.setFont(font)
                     if(self.label == None):
                         self.label = ""
-                    if(min_y < MIN_Y_LABEL):
-                        min_y += MIN_Y_LABEL
+                    if(min_y < min_y_label):
+                        min_y += min_y_label
                     painter.drawText(min_x, min_y, self.label)
 
             if self.fill:
