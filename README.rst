@@ -1,4 +1,10 @@
 LabelImg_OBB
+
+Annotation Guide
+
+.. code:: shell
+    grip README.md --export readme.html
+
 ========
 
 .. image:: https://img.shields.io/pypi/v/labelimg.svg
