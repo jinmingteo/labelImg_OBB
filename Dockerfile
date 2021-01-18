@@ -1,6 +1,5 @@
-# docker build . -t offline_annotator\
-#   --build-arg USER_ID=$(id -u) \
-#   --build-arg GROUP_ID=$(id -g) .
+# docker build . -t offline_annotator --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)
+
 # xhost +local:docker && docker run --rm -e "DISPLAY=${DISPLAY}" -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" --user "$(id -u):$(id -g)" offline_annotator
 
 FROM python:3.6-slim
