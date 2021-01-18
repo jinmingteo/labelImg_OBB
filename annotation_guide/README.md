@@ -1,7 +1,7 @@
 ## Training Pipeline
 
 ![Pipeline](./annotation_pipeline.png)
-### Rotate bounding box for a better fit in Aerial Setting
+### Rotate bounding box for a better fit (esp. in Aerial Settings)
 
 ![OBB](./obb.png)
 
