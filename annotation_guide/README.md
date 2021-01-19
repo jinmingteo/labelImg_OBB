@@ -41,7 +41,19 @@ Type command in terminal:
 
 2. Annotate
   - **Be sure to checkout this [annotation guide first](./Object%20Detection%20Annotation%20Guide.html).**
-  - You can refer to the video too.
+  - You can refer to the videos too. 
+
+#### 'no_target_in_ao' should be annotated when the area of interest has no target.
+
+### Example of 'no_target_in_ao'
+
+![no_target](./no_target_in_ao.jpg)
+
+### Example of 'ignore'
+
+![ignore](./ignore.jpeg)
+
+
 ~~~~~~~
 +------------+--------------------------------------------+
 | Create Box | Click 'Create OrientatedRectBox' or 'w'    |
