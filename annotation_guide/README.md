@@ -49,7 +49,7 @@ Type command in terminal:
 
 ![no_target](./no_target_in_ao.jpg)
 
-### Example of 'ignore'
+### Example of an image that can be skipped **(no annotation needed)**
 
 ![ignore](./ignore.jpeg)
 
