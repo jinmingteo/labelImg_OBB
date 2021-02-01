@@ -67,7 +67,6 @@ Type command in terminal:
 ![ignore](./ignore.jpeg)
 
 
-~~~~~~~
 +------------+--------------------------------------------+
 | Create Box | Click 'Create OrientatedRectBox' or 'w'    |
 +------------+--------------------------------------------+
@@ -97,9 +96,6 @@ Type command in terminal:
 | Save Box   | Click 'Save' or 'Ctrl S' and Enter         |
 |            | Do not change annotation path              |
 
-
-
-~~~~~~~
 
 3. After annotating a video folder, update records in **video_tracker.ods** at Desktop
 
