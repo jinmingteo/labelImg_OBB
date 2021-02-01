@@ -66,26 +66,7 @@ Type command in terminal:
 
 ![ignore](./ignore.jpeg)
 
-
-+------------+--------------------------------------------+
-| Create Box | Click 'Create OrientatedRectBox' or 'w'    |
-+------------+--------------------------------------------+
-| Rotate Box | Right-click the box vertices (red dots)    |
-+------------+--------------------------------------------+
-|            | & drag clockwise/ anti-clockwise           |
-+------------+--------------------------------------------+
-| Resize Box | Left-click the box vertices (red dots)     |
-+------------+--------------------------------------------+
-|            | & drag in/ out                             |
-+------------+--------------------------------------------+
-| Delete Box | Select Box and Press 'del' button          |
-+------------+--------------------------------------------+
-| Save Box   | Click 'Save' or 'Ctrl S' and Enter         |
-+------------+--------------------------------------------+
-|            | Do not change annotation path              |
-+------------+--------------------------------------------+
-
-
+| | |
 |------------|--------------------------------------------|
 | Create Box | Click 'Create OrientatedRectBox' or 'w'    |
 | Rotate Box | Right-click the box vertices (red dots)    |
@@ -94,7 +75,6 @@ Type command in terminal:
 |            | & drag in/ out                             |
 | Delete Box | Select Box and Press 'del' button          |
 | Save Box   | Click 'Save' or 'Ctrl S' and Enter         |
-|            | Do not change annotation path              |
 
 
 3. After annotating a video folder, update records in **video_tracker.ods** at Desktop
@@ -111,27 +91,13 @@ Type command in terminal:
     again, and it will work.
 
 #### Hotkeys
-~~~~~~~
-
-+------------+--------------------------------------------+
+| | |
+|------------|--------------------------------------------|
 | Ctrl + u   | Load all of the images from a directory    |
-+------------+--------------------------------------------+
 | Ctrl + s   | Save                                       |
-+------------+--------------------------------------------+
 | Ctrl + d   | Copy the current label and rect box        |
-+------------+--------------------------------------------+
 | w          | Create a rect box                          |
-+------------+--------------------------------------------+
 | d          | Next image                                 |
-+------------+--------------------------------------------+
 | a          | Previous image                             |
-+------------+--------------------------------------------+
 | del        | Delete the selected rect box               |
-+------------+--------------------------------------------+
-| Ctrl++     | Zoom in                                    |
-+------------+--------------------------------------------+
-| Ctrl--     | Zoom out                                   |
-+------------+--------------------------------------------+
 |            | Keyboard arrows to move selected rect box  |
-+------------+--------------------------------------------+
-~~~~~~~
