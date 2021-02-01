@@ -7,9 +7,18 @@
 
 Image from: https://www.mdpi.com/2072-4292/9/11/1170/htm
 
+## Video Tutorial
+You can refer to the video at Desktop.
+
+```SETTING_UP.mp4```
+
+```HOW_TO_ANNOTATE.mp4```
+
 ## Step 1: Convert Video to Frames
 
 Open new Terminal **(Ctrl + Alt + T)**
+
+To paste in terminal: **(Ctrl + Shift + V)**
 
 Type command in terminal: 
 
@@ -17,7 +26,7 @@ Type command in terminal:
 
 Store the respective videos into the opened folder
 
-Open Terminal **(Ctrl + Alt + T)**
+Go back to the Terminal
 
 Type command in terminal: 
 
@@ -27,21 +36,25 @@ You should see a "Video2Frames Completed" message from the terminal
 
 ## Step 2: Annotate Frames
 
-Open Terminal **(Ctrl + Alt + T)**
+Go back to the Terminal
 
 Type command in terminal: 
 
   - ```bash ~/Desktop/annotate.sh```
 
 ### Brief Instructions for annotation
-1. Choose the folder that you want to annotate.
-  - Open Dir **(Ctrl + U)** 
-  
+1. Open Dir **(Ctrl + U)** 
+  - Choose the folder that you want to annotate.
     - ```/workspace/videos/<video_name>```
+  
+  - "Save annotations to the directory"
+    - Choose the same folder as before.
 
 2. Annotate
   - **Be sure to checkout this [annotation guide first](./Object%20Detection%20Annotation%20Guide.html).**
-  - You can refer to the videos too. 
+  - You can refer to the ```HOW_TO_ANNOTATE.mp4``` at Desktop too.
+
+### Rule of thumb: Image should be capturing the ground image.
 
 #### 'no_target_in_ao' should be annotated when the area of interest has no target.
 
@@ -58,8 +71,6 @@ Type command in terminal:
 +------------+--------------------------------------------+
 | Create Box | Click 'Create OrientatedRectBox' or 'w'    |
 +------------+--------------------------------------------+
-|            | Select 'ignore' if no label of interest    |
-+------------+--------------------------------------------+
 | Rotate Box | Right-click the box vertices (red dots)    |
 +------------+--------------------------------------------+
 |            | & drag clockwise/ anti-clockwise           |
@@ -74,6 +85,19 @@ Type command in terminal:
 +------------+--------------------------------------------+
 |            | Do not change annotation path              |
 +------------+--------------------------------------------+
+
+
+| --- | --- |
+| Create Box | Click 'Create OrientatedRectBox' or 'w' |
+| Rotate Box | Right-click the box vertices (red dots) |
+|            | & drag clockwise/ anti-clockwise |
+| Resize Box | Left-click the box vertices (red dots)|
+|            | & drag in/ out |
+| Delete Box | Select Box and Press 'del' button  |
+| Save Box   | Click 'Save' or 'Ctrl S' and Enter         |
+|            | Do not change annotation path              |
+
+
 
 ~~~~~~~
 
