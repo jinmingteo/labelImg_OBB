@@ -87,15 +87,15 @@ Type command in terminal:
 +------------+--------------------------------------------+
 
 
-| --- | --- |
+|------------|--------------------------------------------|
 | Create Box | Click 'Create OrientatedRectBox' or 'w'    |
 | Rotate Box | Right-click the box vertices (red dots)    |
-| ---        | & drag clockwise/ anti-clockwise |
-| Resize Box | Left-click the box vertices (red dots)|
-| ---            | & drag in/ out |
-| Delete Box | Select Box and Press 'del' button  |
+|            | & drag clockwise/ anti-clockwise           |
+| Resize Box | Left-click the box vertices (red dots)     |
+|            | & drag in/ out                             |
+| Delete Box | Select Box and Press 'del' button          |
 | Save Box   | Click 'Save' or 'Ctrl S' and Enter         |
-| ---        | Do not change annotation path              |
+|            | Do not change annotation path              |
 
 
 
