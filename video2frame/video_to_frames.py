@@ -29,7 +29,7 @@ def get_frame_from_path(path, output_dir, images_per_sec=1, force_render=False):
     """
 
     assert os.path.exists(path), "No such path: {}".format(path)
-    vid_fm = (".flv", ".avi", ".mp4", ".3gp", ".mov", ".gif" ".webm")
+    vid_fm = (".flv", ".avi", ".mp4", ".3gp", ".mov", ".gif" ".webm", ".ts")
 
     video_paths = [video_name for video_name in os.listdir(path) if os.path.splitext(video_name)[-1] in vid_fm]
     for video in video_paths:
