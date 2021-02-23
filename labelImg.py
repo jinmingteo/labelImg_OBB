@@ -390,7 +390,7 @@ class MainWindow(QMainWindow, WindowMixin):
         addActions(self.menus.file,
         #            (open, opendir, copyPrevBounding, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, deleteImg, quit))
         # addActions(self.menus.help, (help, showInfo))
-                   (open, opendir, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, quit))
+                   (open, opendir, copyPrevBounding, changeSavedir, openAnnotation, self.menus.recentFiles, save, save_format, saveAs, close, resetAll, quit))
         addActions(self.menus.help, (showQuickInstr, help, showInfo))
         addActions(self.menus.view, (
             self.autoSaving,
@@ -1208,7 +1208,8 @@ class MainWindow(QMainWindow, WindowMixin):
             if os.path.isfile(xmlPath):
                 self.loadPascalXMLByFilename(xmlPath)
             elif os.path.isfile(txtPath):
-                self.loadYOLOTXTByFilename(txtPath)
+                # self.loadYOLOTXTByFilename(txtPath)
+                self.loadYOLOTOBBXTByFilename(txtPath)
             elif os.path.isfile(jsonPath):
                 self.loadCreateMLJSONByFilename(jsonPath, filePath)
 
@@ -1218,7 +1219,8 @@ class MainWindow(QMainWindow, WindowMixin):
             if os.path.isfile(xmlPath):
                 self.loadPascalXMLByFilename(xmlPath)
             elif os.path.isfile(txtPath):
-                self.loadYOLOTXTByFilename(txtPath)
+                # self.loadYOLOTXTByFilename(txtPath)
+                self.loadYOLOTOBBXTByFilename(txtPath)
 
     def resizeEvent(self, event):
         if self.canvas and not self.image.isNull()\
