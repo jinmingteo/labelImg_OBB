@@ -237,6 +237,8 @@ Hotkeys
 +------------+--------------------------------------------+
 |            | Keyboard arrows to move selected rect box  |
 +------------+--------------------------------------------+
+| Ctrl + v   | Copy Bounding boxes from previous image    |
++------------+--------------------------------------------+
 
 How to contribute
 ~~~~~~~~~~~~~~~~~
