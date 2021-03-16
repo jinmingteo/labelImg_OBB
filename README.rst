@@ -239,7 +239,7 @@ Hotkeys
 +------------+--------------------------------------------+
 | Ctrl + v   | Copy Bounding boxes from previous image    |
 +------------+--------------------------------------------+
-| Shift + rotate/move | mass rotate/move                  |
+|            | Press Shift to move or rotate all boxes    |
 +------------+--------------------------------------------+
 
 How to contribute
