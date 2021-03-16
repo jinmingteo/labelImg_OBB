@@ -110,6 +110,7 @@ class Canvas(QWidget):
     def mouseMoveEvent(self, ev):
         """Update line with last point and current coordinates."""
         pos = self.transformPos(ev.pos())
+        modifiers = QApplication.keyboardModifiers()
 
         # Update coordinates in status bar if image is opened
         window = self.parent().window()
@@ -171,7 +172,10 @@ class Canvas(QWidget):
                 self.repaint()
             elif self.selectedShape and self.prevPoint:
                 self.overrideCursor(CURSOR_MOVE)
-                self.boundedMoveShape(self.selectedShape, pos)
+                if modifiers == Qt.ShiftModifier:
+                    self.boundedMoveShapes(self.shapes, pos)
+                else:
+                    self.boundedMoveShape(self.selectedShape, pos)
                 self.shapeMoved.emit()
                 self.repaint()
             else:
@@ -185,7 +189,10 @@ class Canvas(QWidget):
         elif Qt.RightButton & ev.buttons(): # ev.buttons is mouse buttons mask (https://doc.qt.io/qt-5/qt.html#MouseButton-enum)
             if self.selectedVertex():
                 self.overrideCursor(CURSOR_CROSS)
-                self.rotateVertex(pos)
+                if modifiers == Qt.ShiftModifier:
+                    self.rotateVertexAll(pos)
+                else:
+                    self.rotateVertex(pos)
                 self.shapeMoved.emit()
                 self.repaint()
             return
@@ -443,6 +450,18 @@ class Canvas(QWidget):
             angle_original = math.atan2(point.y()-shape.origin[1], point.x()-shape.origin[0])
             shape.rotateBy(angle_target-angle_original, self.pixmap.width(), self.pixmap.height()) # Clock-wise
 
+    def rotateVertexAll(self, pos):
+        index, shape = self.hVertex, self.hShape
+        point = shape[index]
+        if self.outOfPixmap(pos):
+            pos = self.intersectionPoint(point, pos)
+
+        if not self.drawSquare:
+            angle_target =   math.atan2(pos.y()  -shape.origin[1], pos.x()  -shape.origin[0])
+            angle_original = math.atan2(point.y()-shape.origin[1], point.x()-shape.origin[0])
+            for s in self.shapes:
+                s.rotateBy(angle_target-angle_original, self.pixmap.width(), self.pixmap.height()) # Clock-wise
+
     def boundedMoveShape(self, shape, pos):
         if self.outOfPixmap(pos):
             return False  # No need to move
@@ -461,6 +480,29 @@ class Canvas(QWidget):
         dp = pos - self.prevPoint
         if dp:
             shape.moveBy(dp)
+            self.prevPoint = pos
+            return True
+        return False
+
+    def boundedMoveShapes(self, shapes, pos):
+        if self.outOfPixmap(pos):
+            return False  # No need to move
+        o1 = pos + self.offsets[0]
+        if self.outOfPixmap(o1):
+            pos -= QPointF(min(0, o1.x()), min(0, o1.y()))
+        o2 = pos + self.offsets[1]
+        if self.outOfPixmap(o2):
+            pos += QPointF(min(0, self.pixmap.width() - o2.x()),
+                           min(0, self.pixmap.height() - o2.y()))
+        # The next line tracks the new position of the cursor
+        # relative to the shape, but also results in making it
+        # a bit "shaky" when nearing the border and allows it to
+        # go outside of the shape's area for some reason. XXX
+        #self.calculateOffsets(self.selectedShape, pos)
+        dp = pos - self.prevPoint
+        if dp:
+            for s in self.shapes:
+                s.moveBy(dp)
             self.prevPoint = pos
             return True
         return False
