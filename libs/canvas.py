@@ -670,6 +670,8 @@ class Canvas(QWidget):
 
     def keyPressEvent(self, ev):
         key = ev.key()
+        modifiers = QApplication.keyboardModifiers()
+
         if key == Qt.Key_Escape and self.current:
             print('ESC press')
             self.current = None
@@ -678,28 +680,36 @@ class Canvas(QWidget):
         elif key == Qt.Key_Return and self.canCloseShape():
             self.finalise()
         elif key == Qt.Key_Left and self.selectedShape:
-            self.moveOnePixel('Left')
+            self.moveOnePixel('Left', move_all=(modifiers == Qt.ShiftModifier))
         elif key == Qt.Key_Right and self.selectedShape:
-            self.moveOnePixel('Right')
+            self.moveOnePixel('Right', move_all=(modifiers == Qt.ShiftModifier))
         elif key == Qt.Key_Up and self.selectedShape:
-            self.moveOnePixel('Up')
+            self.moveOnePixel('Up', move_all=(modifiers == Qt.ShiftModifier))
         elif key == Qt.Key_Down and self.selectedShape:
-            self.moveOnePixel('Down')
+            self.moveOnePixel('Down', move_all=(modifiers == Qt.ShiftModifier))
 
-    def moveOnePixel(self, direction):
+    def moveOnePixel(self, direction, move_all=False):
+        movement = QPointF(0, 0)
         # print(self.selectedShape.points)
         if direction == 'Left' and not self.moveOutOfBound(QPointF(-1.0, 0)):
             # print("move Left one pixel")
-            self.selectedShape.moveBy(QPointF(-1, 0))
+            movement = QPointF(-1, 0)
         elif direction == 'Right' and not self.moveOutOfBound(QPointF(1.0, 0)):
             # print("move Right one pixel")
-            self.selectedShape.moveBy(QPointF(1, 0))
+            movement = QPointF(1, 0)
         elif direction == 'Up' and not self.moveOutOfBound(QPointF(0, -1.0)):
             # print("move Up one pixel")
-            self.selectedShape.moveBy(QPointF(0, -1))
+            movement = QPointF(0, -1)
         elif direction == 'Down' and not self.moveOutOfBound(QPointF(0, 1.0)):
             # print("move Down one pixel")
-            self.selectedShape.moveBy(QPointF(0, 1))
+            movement = QPointF(0, 1)
+
+        if move_all:
+            for shape in self.shapes:
+                shape.moveBy(movement)
+        else:
+            self.selectedShape.moveBy(movement)
+
         self.shapeMoved.emit()
         self.repaint()
 
