@@ -1,6 +1,8 @@
 
 ## Change log
 
+[Mass rotate/move BBS](https://github.com/jinmingteo/labelImg_OBB/commit/ac4f5026181d758d461c182279d1c02f568b56b7)
+
 [Copy BBs from previous image](https://github.com/jinmingteo/labelImg_OBB/commit/73ef56f9bcf41480b4f633f17f6f0d7217e7f0e2)
 
 [Hide annotation label to allow OBBox to see properly](https://github.com/jinmingteo/labelImg_OBB/commit/4af2294ab0221dc171d7aa55d84f001dde5b76e2)
