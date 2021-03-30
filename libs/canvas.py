@@ -12,7 +12,6 @@ except ImportError:
 
 from libs.shape import Shape
 from libs.utils import distance
-from libs.vector import Vector
 
 CURSOR_DEFAULT = Qt.ArrowCursor
 CURSOR_POINT = Qt.PointingHandCursor
@@ -419,7 +418,7 @@ class Canvas(QWidget):
             if pos.y() - shape[opposite_point_index].y() > -1 and pos.y() - shape[opposite_point_index].y() < 0:
                 pos.setY(shape[opposite_point_index].y() - 1)
             shiftPos = pos - point
-            
+
         shape.moveVertexBy(index, shiftPos)
         # calculate the remaining first vertices
         dist_moved = math.sqrt( ((pos.x()-point.x())**2) + ((pos.y()-point.y())**2) )
