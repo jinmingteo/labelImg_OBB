@@ -11,6 +11,7 @@ except ImportError:
 #from PyQt4.QtOpenGL import *
 
 from libs.shape import Shape
+from libs.vector import Vector
 from libs.utils import distance
 
 CURSOR_DEFAULT = Qt.ArrowCursor
@@ -319,6 +320,12 @@ class Canvas(QWidget):
             targetPos = self.line[1]
             maxX = targetPos.x()
             maxY = targetPos.y()
+
+            if minX == maxX:
+                maxX = maxX + 1
+            if minY == maxY:
+                maxY = maxY + 1
+
             self.current.addPoint(QPointF(maxX, minY)) # Adding canvas points is done here
             self.current.addPoint(targetPos)
             self.current.addPoint(QPointF(minX, maxY))
@@ -398,8 +405,12 @@ class Canvas(QWidget):
             clipped_y = min(max(0, pos.y()), size.height())
             pos = QPointF(clipped_x, clipped_y)
 
+        opposite_point_index = (index + 2) % 4
+        o_to_pos_vector = Vector(shape[opposite_point_index], pos)
+        o_to_prev_vector = Vector(shape[opposite_point_index], shape[(index + 3) % 4])
+        o_to_next_vector = Vector(shape[opposite_point_index], shape[(index + 1) % 4])
+
         if self.drawSquare:
-            opposite_point_index = (index + 2) % 4
             opposite_point = shape[opposite_point_index]
 
             min_size = min(abs(pos.x() - opposite_point.x()), abs(pos.y() - opposite_point.y()))
@@ -408,35 +419,32 @@ class Canvas(QWidget):
             shiftPos = QPointF(opposite_point.x() + directionX * min_size - point.x(),
                                opposite_point.y() + directionY * min_size - point.y())
         else:
-            shiftPos = pos - point
-        shape.moveVertexBy(index, shiftPos)
-        
-        # calculate the remaining first vertices
-        dist_moved = math.sqrt( ((pos.x()-point.x())**2) + ((pos.y()-point.y())**2) )
-        third_point_index = (index + 2) % 4
-        
-        pointToMove_index = (index + 1) % 4
-        base = math.sqrt( ((shape.points[pointToMove_index].x()-shape.points[third_point_index].x())**2) +
-                          ((shape.points[pointToMove_index].y()-shape.points[third_point_index].y())**2) )
-        near_side_sqrd = ((shape.points[pointToMove_index].x()-pos.x())**2) + ((shape.points[pointToMove_index].y()-pos.y())**2)
-        far_side_sqrd = ((shape.points[third_point_index].x()-pos.x())**2) + ((shape.points[third_point_index].y()-pos.y())**2)
-        dist_to_moved = ((near_side_sqrd-far_side_sqrd)/base+base)/2
-        shape.points[pointToMove_index].setX(shape.points[pointToMove_index].x() +
-                          dist_to_moved * (shape.points[third_point_index].x() - shape.points[pointToMove_index].x() ) / base)
-        shape.points[pointToMove_index].setY(shape.points[pointToMove_index].y() +
-                          dist_to_moved * (shape.points[third_point_index].y() - shape.points[pointToMove_index].y() ) / base)       
+            o_to_pos_mag = o_to_pos_vector.magnitude()
+            o_to_prev_mag = o_to_prev_vector.magnitude()
+            o_to_next_mag = o_to_next_vector.magnitude()
 
-        # calculate the remaining second vertices
-        pointToMove_index = (index + 3) % 4
-        base = math.sqrt( ((shape.points[pointToMove_index].x()-shape.points[third_point_index].x())**2) +
-                          ((shape.points[pointToMove_index].y()-shape.points[third_point_index].y())**2) )
-        near_side_sqrd = ((shape.points[pointToMove_index].x()-pos.x())**2) + ((shape.points[pointToMove_index].y()-pos.y())**2)
-        far_side_sqrd = ((shape.points[third_point_index].x()-pos.x())**2) + ((shape.points[third_point_index].y()-pos.y())**2)
-        dist_to_moved = ((near_side_sqrd-far_side_sqrd)/base+base)/2
-        shape.points[pointToMove_index].setX(shape.points[pointToMove_index].x() +
-                          dist_to_moved * (shape.points[third_point_index].x() - shape.points[pointToMove_index].x() ) / base)
-        shape.points[pointToMove_index].setY(shape.points[pointToMove_index].y() +
-                          dist_to_moved * (shape.points[third_point_index].y() - shape.points[pointToMove_index].y() ) / base)  
+            o_to_pos_u_vector = QPointF(o_to_pos_vector.x/o_to_pos_mag, o_to_pos_vector.y/o_to_pos_mag)
+            o_to_prev_u_vector = QPointF(o_to_prev_vector.x/o_to_prev_mag, o_to_prev_vector.y/o_to_prev_mag)
+            o_to_next_u_vector = QPointF(o_to_next_vector.x/o_to_next_mag, o_to_next_vector.y/o_to_next_mag)
+
+            if o_to_pos_u_vector.x() == o_to_prev_u_vector.x() and o_to_pos_u_vector.y() == o_to_prev_u_vector.y():
+                pos = pos + o_to_next_u_vector
+            if o_to_pos_u_vector.x() == o_to_next_u_vector.x() and o_to_pos_u_vector.y() == o_to_next_u_vector.y():
+                pos = pos + o_to_prev_u_vector
+
+            shiftPos = pos - point
+
+        point_to_pos_vector = Vector(point, pos)
+
+        prev_proj = point_to_pos_vector.projection(o_to_prev_vector)
+        next_proj = point_to_pos_vector.projection(o_to_next_vector)
+
+        prev_shiftPos = QPointF(o_to_prev_vector.x * prev_proj, o_to_prev_vector.y * prev_proj)
+        next_shiftPos = QPointF(o_to_next_vector.x * next_proj, o_to_next_vector.y * next_proj)
+
+        shape.moveVertexBy(index, shiftPos)
+        shape.moveVertexBy((index + 3) % 4, prev_shiftPos)
+        shape.moveVertexBy((index + 1) % 4, next_shiftPos)
 
         
     def rotateVertex(self, pos):
