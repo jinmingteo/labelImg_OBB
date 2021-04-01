@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!-- saved from url=(0060)https://dinohub.github.io/Object-Detection-Annotation-Guide/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="./Object Detection Annotation Guide _ DinoHub_files/logo.png">
+
+<title>Object Detection Annotation Guide | DinoHub</title>
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Object Detection Annotation Guide | DinoHub</title>
+<meta name="generator" content="Jekyll v3.9.0">
+<meta property="og:title" content="Object Detection Annotation Guide">
+<meta name="author" content="levan">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Guide to annotating for an object detection task">
+<meta property="og:description" content="Guide to annotating for an object detection task">
+<link rel="canonical" href="https://dinohub.github.io/Object-Detection-Annotation-Guide/">
+<meta property="og:url" content="https://dinohub.github.io/Object-Detection-Annotation-Guide/">
+<meta property="og:site_name" content="DinoHub">
+<meta property="og:image" content="https://dinohub.github.io/assets/images/od_annot_guide/od_annot_cover.png">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2020-07-21T00:00:00+00:00">
+<script async="" src="./Object Detection Annotation Guide _ DinoHub_files/analytics.js"></script><script type="application/ld+json">
+{"dateModified":"2020-07-21T00:00:00+00:00","datePublished":"2020-07-21T00:00:00+00:00","@type":"BlogPosting","image":"https://dinohub.github.io/assets/images/od_annot_guide/od_annot_cover.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://dinohub.github.io/Object-Detection-Annotation-Guide/"},"description":"Guide to annotating for an object detection task","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://dinohub.github.io/assets/images/logo.png"},"name":"levan"},"author":{"@type":"Person","name":"levan"},"url":"https://dinohub.github.io/Object-Detection-Annotation-Guide/","headline":"Object Detection Annotation Guide","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<link rel="stylesheet" href="./Object Detection Annotation Guide _ DinoHub_files/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    
+<link href="./Object Detection Annotation Guide _ DinoHub_files/screen.css" rel="stylesheet">
+
+<link href="./Object Detection Annotation Guide _ DinoHub_files/main.css" rel="stylesheet">
+
+<script src="./Object Detection Annotation Guide _ DinoHub_files/jquery.min.js"></script>
+
+<!-- Content
+================================================== -->
+<div class="main-content">
+    <!-- Begin Article
+================================================== -->
+<div class="container">
+        <!-- Post -->
+        
+
+        <div class="col-md-9 flex-first flex-md-unordered">
+            <div class="mainheading">
+                <!-- Post Title -->
+                <h1 class="posttitle">Object Detection Annotation Guide</h1>
+
+            </div>
+
+            <!-- Post Content -->
+            <div class="article-post">
+                <!-- Toc if any -->
+                
+                <!-- End Toc -->
+                <p>This blog post is meant for annotators who are embarking on their journey to help label data for object detection. We hope to briefly introduce you to the computer vision task and <em>your</em> task as an annotator.</p>
+
+<h2 id="1-introduction">1. Introduction</h2>
+
+<p>Object detection is a computer vision task of localising and classifying objects of interest — There are some objects I want to find in an image frame.. where are they, and what are they?</p>
+
+<div style="text-align: center">
+
+    <img src="./Object Detection Annotation Guide _ DinoHub_files/catdog.jpg" alt="catdog">
+
+</div>
+
+<p>In our work, we want to train an AI model to perform this task of object detection. To do that, we need to provide the AI model with the ground-truths during training. AI models are very data-hungry, they require huge amounts of <strong>labelled</strong> data to train well. We are talking in orders of tens of thousands images.</p>
+
+<p>Just to clear up some jargons up front:</p>
+
+<ul>
+  <li><strong>Annotation = Labels</strong>, to “teach” our AI models the ground-truths.</li>
+  <li><strong>Classes = Categories</strong> of objects defined by us, for example, Cats, Dogs, Horses, etc.</li>
+</ul>
+
+<h2 id="2-format">2. Format</h2>
+
+<p>Annotations for an Object Detection task comprise of bounding boxes (bbs) and their respective class labels:</p>
+
+<ol>
+  <li>Bounding boxes: Bbs are rectangular boxes (typically not rotated, aka, aligned with the edges of the image). The bbs tightly bound out the objects of interest in the image.</li>
+  <li>Class labels: The class label is then given for each bb to say what it is — is it a cat? or is it a dog?</li>
+</ol>
+
+<h2 id="3-some-standards">3. Some Standards</h2>
+
+<h3 id="quality-over-quantity">Quality over Quantity</h3>
+
+<p>We prefer <strong>good</strong> annotations instead of getting annotations done fast. This is because the quality of data and its labels is critical to the training of the AI model and its eventual accuracy. Take your time and be thorough!</p>
+
+<p>We understand it will get repetitive and droning, so take a break when you find yourself zoning out! Take a walk, eat something..</p>
+
+<div style="text-align: center">
+
+<img src="./Object Detection Annotation Guide _ DinoHub_files/b16.jpg" alt="take a break" width="300">
+
+</div>
+
+<p>Then return to the grind!</p>
+
+<h3 id="be-exhaustive">Be Exhaustive</h3>
+
+<p>Often, there will be multiple objects of interest in one frame, we will need <strong>all</strong> of the objects to be annotated. A partially annotated image is worse than having no image at all, because it will throw off the AI model during its training.</p>
+
+<div style="text-align: center">
+<p><img src="./Object Detection Annotation Guide _ DinoHub_files/exhuastive_catdog.png" alt="exhuastive cat dog"></p>
+</div>
+
+<h3 id="make-it-tight">Make it Tight</h3>
+
+<p>Bounding boxes should tightly bound the object of interest to the limits of what is considered the part of the object (for example, the cat’s tail is part of the cat, so the bounding box should include the tail). Having loose bounding box is an example of poor quality annotation.</p>
+
+<div style="text-align: center">
+<p><img src="./Object Detection Annotation Guide _ DinoHub_files/loose_tight.png" alt="loose tight cat"></p>
+</div>
+
+<h3 id="handling-partial-occlusions">Handling Partial Occlusions</h3>
+
+<p>You will definitely face cases where the object of interest is partially block by another object or obstacle. In these cases, try your best as a human to imagine/hallucinate the full extent of the object, and draw your bounding box accordingly.</p>
+
+<div style="text-align: center">
+
+<img src="./Object Detection Annotation Guide _ DinoHub_files/part_occlusion.png" alt="partial occlusion" width="300">
+
+</div>
+
+<h2 style="text-align: center;"> Thank you for your annotating efforts! </h2>
+<!-- End Article
+================================================== -->

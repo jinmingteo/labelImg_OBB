@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import re
-import resources
 import os
 import sys
 import locale
@@ -35,7 +34,8 @@ class StringBundle:
                     locale.getlocale()) > 0 else os.getenv('LANG')
             except:
                 print('Invalid locale')
-                locale = 'en'
+                localeStr = 'en'
+
         return StringBundle(cls.__create_key, localeStr)
 
     def getString(self, stringId):

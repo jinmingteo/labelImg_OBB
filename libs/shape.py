@@ -14,7 +14,7 @@ except ImportError:
     from PyQt4.QtGui import *
     from PyQt4.QtCore import *
 
-from libs.lib import distance
+from libs.utils import distance
 import sys
 
 DEFAULT_LINE_COLOR = QColor(0, 255, 0, 128)
@@ -45,6 +45,7 @@ class Shape(object):
     point_type = P_ROUND
     point_size = 8
     scale = 1.0
+    labelFontSize = 8
 
     def __init__(self, label=None, line_color=None, difficult=False, paintLabel=False):
         self.label = label
@@ -128,25 +129,8 @@ class Shape(object):
             painter.fillPath(vrtx_path, self.vertex_fill_color)
             painter.fillPath(originPoint_path, self.origin_fill_color)
 
-            # Print debug info
-            min_x = sys.maxsize
-            min_y = sys.maxsize
-            for point in self.points:
-                min_x = min(min_x, point.x())
-                min_y = min(min_y, point.y())
-            if min_x != sys.maxsize and min_y != sys.maxsize:
-                font = QFont()
-                font.setPointSize(10)
-                font.setBold(True)
-                painter.setFont(font)
-                if(self.label == None):
-                    self.label = ""
-                if(min_y < MIN_Y_LABEL):
-                    min_y += MIN_Y_LABEL
-                painter.drawText(min_x, min_y, "h={0:.1f}, w={1:.1f} , \u03F4={2:.1f}".format(self.height, self.width, self.angle))
-
-            # Draw text at the top-left
             if self.paintLabel:
+                # Print debug info
                 min_x = sys.maxsize
                 min_y = sys.maxsize
                 for point in self.points:
@@ -154,14 +138,14 @@ class Shape(object):
                     min_y = min(min_y, point.y())
                 if min_x != sys.maxsize and min_y != sys.maxsize:
                     font = QFont()
-                    font.setPointSize(8)
+                    font.setPointSize(10)
                     font.setBold(True)
                     painter.setFont(font)
                     if(self.label == None):
                         self.label = ""
                     if(min_y < MIN_Y_LABEL):
                         min_y += MIN_Y_LABEL
-                    painter.drawText(min_x, min_y, self.label)
+                    painter.drawText(min_x, min_y, "h={0:.1f}, w={1:.1f} , \u03F4={2:.1f}".format(self.height, self.width, self.angle))
 
             if self.fill:
                 color = self.select_fill_color if self.selected else self.fill_color
