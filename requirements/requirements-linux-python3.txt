@@ -1,3 +1,4 @@
 pyqt5==5.10.1
 lxml==4.2.4
 numpy==1.19.5
+pyinstaller==4.3
