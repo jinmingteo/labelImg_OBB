@@ -9,4 +9,6 @@
 
 [Set auto save = True; so that annotators don't have to keep saving](https://github.com/jinmingteo/labelImg_OBB/commit/6e00de3fca9f4722deb5b5ace2a5d42742491c3b)
 
+[Instructions for exporting a .exe file](https://github.com/jinmingteo/labelImg_OBB/commit/2a9038b56b20a16bcf527779a6a7fac07eb4c719)
+
 Merge old repo with master and tested out the pipeline
